@@ -1,4 +1,4 @@
-package com.example.tp_food
+package com.williamyataco.appcustomer
 
 import android.os.Bundle
 

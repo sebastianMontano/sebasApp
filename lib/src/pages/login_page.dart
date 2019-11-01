@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:tp_food/src/bloc/provider.dart';
 import 'package:tp_food/src/providers/usuario_provider.dart';
-import 'package:tp_food/src/utils/utils.dart';
+import 'package:tp_food/src/utils/utils.dart' as utils;
 
 import 'home_page.dart';
 
@@ -65,7 +65,6 @@ class LoginPage extends StatelessWidget {
                ],
              ),
            ),
-
            FlatButton(
              child: Text('Crear una nueva cuenta'),
              onPressed: ()=> Navigator.pushReplacementNamed(context, 'registro'),
@@ -151,8 +150,8 @@ class LoginPage extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: <Color> [
-            Color.fromRGBO(63, 63, 156, 1.0),
-            Color.fromRGBO(90, 70, 178, 1.0),
+            Color.fromRGBO(63, 156, 20, 1.0),
+            Color.fromRGBO(90, 156, 20, 1.0),
           ]
         )
       ),
@@ -191,18 +190,10 @@ class LoginPage extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                       builder: (context) => HomePage(
-                            title: result["email"] +
-                                "'s App",
+                            title: result["nombres"],
                             uid: currentUser.user.uid,
                           ))))
-          .catchError((err) => print(err)))
-      .catchError((err) => print(err));  
-    /*Map info = await usuarioProvider.login(bloc.email, bloc.password);
-
-    if(info['ok']){
-      Navigator.pushReplacementNamed(context, 'home');
-    }else{
-      mostrarAlerta(context,info['mensaje']);
-    }*/
+          .catchError((err) => utils.mostrarAlerta(context,err.message)))
+      .catchError((err) => utils.mostrarAlerta(context,err.message));  
   }
 }

@@ -1,15 +1,26 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:tp_food/src/bloc/provider.dart';
-import 'package:tp_food/src/providers/usuario_provider.dart';
-import 'package:tp_food/src/utils/utils.dart';
-
+import 'package:tp_food/src/model/usuario_model.dart';
+import 'package:tp_food/src/utils/utils.dart' as utils;
+import 'package:intl/intl.dart';
 import 'home_page.dart';
 
-class RegistroPage extends StatelessWidget {
+class RegistroPage extends StatefulWidget {
+  RegistroPage({Key key}) : super(key: key);
 
- final usuarioProvider = new UsuarioProvider();
+  @override
+  _RegistroPageState createState() => _RegistroPageState();
+}
+
+class _RegistroPageState extends State<RegistroPage>{
+
+ final formkey = GlobalKey<FormState>();
+ UsuarioModel usuario = new UsuarioModel();
+ TextEditingController pwdInputController = new TextEditingController();
+ //DateTime selectedDate = DateTime.now();
+ final format = DateFormat("dd/MM/yyyy");
 
   @override
   Widget build(BuildContext context) {
@@ -17,16 +28,16 @@ class RegistroPage extends StatelessWidget {
       body: Stack(
         children: <Widget>[
           _crearFondo(context),
-          _loginForm(context),
+          _registroForm(context),
         ],
       )
     );
   }
 
-  Widget _loginForm(BuildContext context){
+  Widget _registroForm(BuildContext context){
 
     final size = MediaQuery.of(context).size;
-    final bloc = Provider.of(context);
+    //final bloc = Provider.of(context);
 
      return SingleChildScrollView(
        child: Column(
@@ -34,7 +45,7 @@ class RegistroPage extends StatelessWidget {
 
            SafeArea(
              child: Container(
-               height: 200.0,
+               height: 50.0,
              ),
            ),
 
@@ -53,17 +64,22 @@ class RegistroPage extends StatelessWidget {
                   spreadRadius: 3.0)
                ]
              ),
-             child: Column(
-               children: <Widget>[
-                 Text('Registro' , style : TextStyle(fontSize: 20.0)),
-                 SizedBox(height: 60.0),
-                 _crearEmail(bloc),
-                 SizedBox(height: 30.0),
-                 _crearPassword(bloc),
-                 SizedBox(height: 30.0),
-                 _crearBoton(bloc)
-               ],
-             ),
+             child: Form(
+                key: formkey,
+                child: Column(
+                  children: <Widget>[
+                    Text('Registro' , style : TextStyle(fontSize: 20.0)),
+                    SizedBox(height: 60.0),
+                    _crearInputNombres(),
+                    _crearInputEmail(),
+                    _crearInputPassword(),
+                    _crearInputDNI(),
+                    _crearInputFechaNacimiento(),
+                    SizedBox(height: 30.0),
+                    _crearBoton(context)
+                  ],
+              ),
+             )           
            ),
 
            FlatButton(
@@ -76,57 +92,140 @@ class RegistroPage extends StatelessWidget {
      );
   }
 
-  Widget _crearEmail(LoginBloc bloc){
+  Widget _crearInputNombres(){
 
-    return StreamBuilder(
-      stream: bloc.emailStream ,
-      builder: (BuildContext context, AsyncSnapshot snapshot){
-        return Container(
-          padding: EdgeInsets.symmetric(horizontal: 20.0),
-          child: TextField(
-            keyboardType: TextInputType.emailAddress,
-            decoration: InputDecoration(
-              icon: Icon(Icons.alternate_email,color:Colors.deepPurpleAccent),
-              hintText: 'ejemplo@correo.com',
-              labelText: 'Correo electronico',
-              counterText: snapshot.data,
-              errorText: snapshot.error,
-            ),
-            onChanged: bloc.changeEmail,
-          ),
-        );
-      },
-    );  
-  }
-
-  Widget _crearPassword(LoginBloc bloc){
-
-    return StreamBuilder(
-      stream: bloc.passwordStream ,
-      builder: (BuildContext context, AsyncSnapshot snapshot){
-        return Container(
-          padding: EdgeInsets.symmetric(horizontal: 20.0),
-          child: TextField(
-            obscureText: true,
-            decoration: InputDecoration(
-              icon: Icon(Icons.lock_outline,color:Colors.deepPurpleAccent),
-              labelText: 'Contraseña',
-              counterText: snapshot.data,
-              errorText: snapshot.error,
-            ),
-            onChanged: bloc.changePassword,
-          ),
-        );
-      },
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 20.0),
+      child: TextFormField(
+        initialValue: usuario.nombres,
+        keyboardType: TextInputType.text,
+        decoration: InputDecoration(
+          icon: Icon(Icons.text_fields,color:Colors.deepPurpleAccent),
+          labelText: 'Nombre Completo',
+          //errorText: snapshot.error,
+        ),
+        //onChanged: bloc.changeEmail,
+        onSaved: (value) => usuario.nombres = value,
+            
+      ),
     );
-    
+
   }
 
-  Widget _crearBoton(LoginBloc bloc){
+  Widget _crearInputEmail(){
 
-    return StreamBuilder(
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 20.0),
+      child: TextFormField(
+        initialValue: usuario.email,
+        keyboardType: TextInputType.emailAddress,
+        decoration: InputDecoration(
+          icon: Icon(Icons.alternate_email,color:Colors.deepPurpleAccent),
+          hintText: 'ejemplo@correo.com',
+          labelText: 'Correo electronico',
+          //errorText: snapshot.error,
+        ),
+        //onChanged: bloc.changeEmail,
+        onSaved: (value)=> usuario.email = value,
+        validator: (value) {
+            if (utils.validarCorreo(value)){
+              return null;
+            }else{
+              return 'Email no es correcto';
+            }
+        },
+      ),
+    );
+
+  }
+
+  Widget _crearInputPassword(){
+
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 20.0),
+      child: TextFormField(
+        obscureText: true,
+        decoration: InputDecoration(
+          icon: Icon(Icons.lock_outline,color:Colors.deepPurpleAccent),
+          labelText: 'Contraseña',
+          //errorText: snapshot.error,
+        ),
+        //onChanged: bloc.changePassword,
+        controller: pwdInputController,
+        validator: (value){
+          if(value.length >=6){
+            return null;
+          }else{
+            return 'Más de 6 caracteres';
+          }
+        },
+      ),
+    );
+  }
+
+  Widget _crearInputDNI(){
+
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 20.0),
+      child: TextFormField(
+
+        keyboardType: TextInputType.number,
+        maxLength: 8,
+        decoration: InputDecoration(
+          icon: Icon(Icons.note,color:Colors.deepPurpleAccent),
+          labelText: 'Documento de Identidad',
+        ),
+        onSaved: (value)=> usuario.dni = int.tryParse(value),
+        validator: (value){
+          if(utils.isNumeric(value)){
+            return null;
+          }else{
+            return 'Solo Números';
+          }
+        },
+      ),
+    );
+  }
+
+  Widget _crearInputFechaNacimiento(){
+
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 20.0),
+      child: DateTimeField(
+        format: format,
+        decoration: InputDecoration(
+          icon: Icon(Icons.note,color:Colors.deepPurpleAccent),
+          labelText: 'Fecha Nacimiento',
+        ),
+        onSaved: (value)=> usuario.fechaNac = value.toString(),
+        validator: (date){
+          final date2 = DateTime.now();
+          print(date2.difference(date).inDays);
+          final year = (date2.difference(date).inDays/365).floor();
+          print(year);
+
+          if( year >= 18){
+            return null;
+          }else{
+            return "Debe ser Mayor de Edad";
+          }
+        },
+        onShowPicker: (context, currentValue) {
+          return showDatePicker(
+              context: context,
+              firstDate: DateTime(1900),
+              initialDate: currentValue ?? DateTime.now(),
+              lastDate: DateTime(2100));
+        },
+      ),
+    );
+  }
+
+  Widget _crearBoton(BuildContext context){
+
+    /*return StreamBuilder(
       stream: bloc.formValidStream ,
-      builder: (BuildContext context, AsyncSnapshot snapshot){
+      builder: (BuildContext context, AsyncSnapshot snapshot){*/
         return RaisedButton(
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: 80.0, vertical: 15.0),
@@ -136,10 +235,10 @@ class RegistroPage extends StatelessWidget {
           elevation: 0.0,
           color: Colors.deepPurple,
           textColor: Colors.white,
-          onPressed: snapshot.hasData ? ()=> _registro(bloc,context) : null,
+          onPressed:  _registro,
         );
-      },
-    );
+    /*  },
+    );*/
     
   }
 
@@ -148,7 +247,7 @@ class RegistroPage extends StatelessWidget {
     final size = MediaQuery.of(context).size;
 
     final fondoMorado = Container(
-      height: size.height*0.4,
+      height: size.height,
       width: double.infinity,
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -162,47 +261,54 @@ class RegistroPage extends StatelessWidget {
 
     return Stack(
       children: <Widget>[
-        fondoMorado,
-        Container(
-          padding: EdgeInsets.only(top:80.0),
-          child: Column(
-            children: <Widget>[
-                Icon(Icons.person_pin_circle,color:Colors.white,size: 100.0),
-                SizedBox(height: 10.0,width: double.infinity),
-                Text('App Customer', style: TextStyle(color: Colors.white,fontSize: 25.0))
-            ],
-          ),
-        )
-
+        fondoMorado
       ],
     );
   }
 
-  _registro(LoginBloc bloc,BuildContext context) {
+  _registro() {
+
+      if( !formkey.currentState.validate()) return null;
+
+      formkey.currentState.save();
+
       //final info = await usuarioProvider.nuevoUsuario(bloc.email, bloc.password);
-      FirebaseAuth.instance.createUserWithEmailAndPassword(
-      email: bloc.email,
-      password: bloc.password)
+     FirebaseAuth.instance.createUserWithEmailAndPassword(
+      email: usuario.email,
+      password: pwdInputController.text)
       .then((currentUser) => Firestore.instance
         .collection("users")
         .document(currentUser.user.uid)
         .setData({
           "uid": currentUser.user.uid,
-          "email": currentUser.user.email,
+          "nombres": usuario.nombres,
+          "email": usuario.email,
+          "dni": usuario.dni,
+          "fechaNac": usuario.fechaNac,
         }).then((result) => {
           Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => HomePage(
-                          title: currentUser.user.email +  "'s App",
+                    builder: (BuildContext context) => HomePage(
+                          title: usuario.nombres,
                           uid: currentUser.user.uid,
                         )),
                 (_) => false)
-        }).catchError((err) => print(err)))
-      .catchError((err) => print(err));
-    /*if(info['ok']){
-    }else{
-      mostrarAlerta(context,info['mensaje']);
-    }*/
+        }).catchError((err) => utils.mostrarAlerta(context,err.message)))
+      .catchError((err) => utils.mostrarAlerta(context,err.message));
   }
+
+  /*Future<Null> _selectDate(BuildContext context) async {
+    final DateTime picked = await showDatePicker(
+        context: context,
+        initialDate: selectedDate,
+        firstDate: DateTime(2015, 8),
+        lastDate: DateTime(2101));
+    if (picked != null && picked != selectedDate)
+      setState(() {
+        selectedDate = picked;
+      });
+  }*/
+
+  
 }
