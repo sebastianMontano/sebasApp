@@ -2,9 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:tp_food/src/bloc/provider.dart';
+import 'package:tp_food/src/model/usuario_model.dart';
 import 'package:tp_food/src/providers/usuario_provider.dart';
 import 'package:tp_food/src/utils/utils.dart' as utils;
-
+import 'admin_page.dart';
 import 'home_page.dart';
 
 class LoginPage extends StatelessWidget {
@@ -184,15 +185,15 @@ class LoginPage extends StatelessWidget {
       .then((currentUser) => Firestore.instance
           .collection("users")
           .document(currentUser.user.uid)
-          .get()
-          .then((DocumentSnapshot result) =>
-              Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => HomePage(
-                            title: result["nombres"],
-                            uid: currentUser.user.uid,
-                          ))))
+          .get().then((DocumentSnapshot result) =>
+              Navigator.pushReplacement(context,MaterialPageRoute(
+                      builder: (context) {                     
+                        if(result["rol"]=="admin"){
+                          return AdminPage(title: 'Lista de Usuarios',uid: currentUser.user.uid);
+                        }else{
+                          return HomePage(title:  "Lista Productos",usuario: UsuarioModel.fromJson(result.data));
+                        }   
+                      })))
           .catchError((err) => utils.mostrarAlerta(context,err.message)))
       .catchError((err) => utils.mostrarAlerta(context,err.message));  
   }

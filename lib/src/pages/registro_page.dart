@@ -19,7 +19,6 @@ class _RegistroPageState extends State<RegistroPage>{
  final formkey = GlobalKey<FormState>();
  UsuarioModel usuario = new UsuarioModel();
  TextEditingController pwdInputController = new TextEditingController();
- //DateTime selectedDate = DateTime.now();
  final format = DateFormat("dd/MM/yyyy");
 
   @override
@@ -37,18 +36,15 @@ class _RegistroPageState extends State<RegistroPage>{
   Widget _registroForm(BuildContext context){
 
     final size = MediaQuery.of(context).size;
-    //final bloc = Provider.of(context);
 
      return SingleChildScrollView(
        child: Column(
          children: <Widget>[
-
            SafeArea(
              child: Container(
                height: 50.0,
              ),
            ),
-
            Container(
              width: size.width * 0.85,
              margin: EdgeInsets.symmetric(vertical: 30.0),
@@ -81,7 +77,6 @@ class _RegistroPageState extends State<RegistroPage>{
               ),
              )           
            ),
-
            FlatButton(
              child: Text('Ya tienes cuenta?'),
              onPressed: ()=> Navigator.pushReplacementNamed(context, 'login'),
@@ -102,11 +97,8 @@ class _RegistroPageState extends State<RegistroPage>{
         decoration: InputDecoration(
           icon: Icon(Icons.text_fields,color:Colors.deepPurpleAccent),
           labelText: 'Nombre Completo',
-          //errorText: snapshot.error,
         ),
-        //onChanged: bloc.changeEmail,
-        onSaved: (value) => usuario.nombres = value,
-            
+        onSaved: (value) => usuario.nombres = value,         
       ),
     );
 
@@ -123,9 +115,7 @@ class _RegistroPageState extends State<RegistroPage>{
           icon: Icon(Icons.alternate_email,color:Colors.deepPurpleAccent),
           hintText: 'ejemplo@correo.com',
           labelText: 'Correo electronico',
-          //errorText: snapshot.error,
         ),
-        //onChanged: bloc.changeEmail,
         onSaved: (value)=> usuario.email = value,
         validator: (value) {
             if (utils.validarCorreo(value)){
@@ -136,7 +126,6 @@ class _RegistroPageState extends State<RegistroPage>{
         },
       ),
     );
-
   }
 
   Widget _crearInputPassword(){
@@ -148,9 +137,7 @@ class _RegistroPageState extends State<RegistroPage>{
         decoration: InputDecoration(
           icon: Icon(Icons.lock_outline,color:Colors.deepPurpleAccent),
           labelText: 'Contraseña',
-          //errorText: snapshot.error,
         ),
-        //onChanged: bloc.changePassword,
         controller: pwdInputController,
         validator: (value){
           if(value.length >=6){
@@ -223,9 +210,6 @@ class _RegistroPageState extends State<RegistroPage>{
 
   Widget _crearBoton(BuildContext context){
 
-    /*return StreamBuilder(
-      stream: bloc.formValidStream ,
-      builder: (BuildContext context, AsyncSnapshot snapshot){*/
         return RaisedButton(
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: 80.0, vertical: 15.0),
@@ -236,10 +220,7 @@ class _RegistroPageState extends State<RegistroPage>{
           color: Colors.deepPurple,
           textColor: Colors.white,
           onPressed:  _registro,
-        );
-    /*  },
-    );*/
-    
+        ); 
   }
 
   Widget _crearFondo(BuildContext context){
@@ -268,11 +249,10 @@ class _RegistroPageState extends State<RegistroPage>{
 
   _registro() {
 
-      if( !formkey.currentState.validate()) return null;
+     if(!formkey.currentState.validate()) return null;
 
-      formkey.currentState.save();
+     formkey.currentState.save();
 
-      //final info = await usuarioProvider.nuevoUsuario(bloc.email, bloc.password);
      FirebaseAuth.instance.createUserWithEmailAndPassword(
       email: usuario.email,
       password: pwdInputController.text)
@@ -283,6 +263,7 @@ class _RegistroPageState extends State<RegistroPage>{
           "uid": currentUser.user.uid,
           "nombres": usuario.nombres,
           "email": usuario.email,
+          "rol": usuario.rol,
           "dni": usuario.dni,
           "fechaNac": usuario.fechaNac,
         }).then((result) => {
@@ -290,25 +271,12 @@ class _RegistroPageState extends State<RegistroPage>{
                 context,
                 MaterialPageRoute(
                     builder: (BuildContext context) => HomePage(
-                          title: usuario.nombres,
-                          uid: currentUser.user.uid,
+                          title: "Lista Productos",
+                          usuario: usuario
                         )),
                 (_) => false)
         }).catchError((err) => utils.mostrarAlerta(context,err.message)))
       .catchError((err) => utils.mostrarAlerta(context,err.message));
   }
-
-  /*Future<Null> _selectDate(BuildContext context) async {
-    final DateTime picked = await showDatePicker(
-        context: context,
-        initialDate: selectedDate,
-        firstDate: DateTime(2015, 8),
-        lastDate: DateTime(2101));
-    if (picked != null && picked != selectedDate)
-      setState(() {
-        selectedDate = picked;
-      });
-  }*/
-
   
 }

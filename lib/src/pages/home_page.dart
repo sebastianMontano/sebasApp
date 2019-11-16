@@ -1,13 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:tp_food/src/model/usuario_model.dart';
 
 class HomePage extends StatefulWidget {
 
-  HomePage({Key key, this.title, this.uid}) : super(key: key); 
-  //update the constructor to include the uid
+  HomePage({Key key, this.title, this.usuario}) : super(key: key); 
   final String title;
-  final String uid; //include this
-
+  final UsuarioModel usuario; 
 
   @override
   _HomePageState  createState() => _HomePageState();
@@ -32,8 +31,27 @@ class _HomePageState extends State<HomePage> {
             },
           )
         ],
-      )
+      ),
+      body: Container(
+        child: Column(
+          children: <Widget>[
+            Text("Hola ${widget.usuario.rol}"),
+          ],
+        )
+      ),
+      floatingActionButton: _crearProducto(context),
     );
+  }
+
+  _crearProducto(BuildContext context){
+    if(widget.usuario.rol == "provider"){
+      return FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: () => Navigator.pushNamed(context, 'producto'),
+      );
+    }else{
+      return null;
+    }     
   }
 
 }
