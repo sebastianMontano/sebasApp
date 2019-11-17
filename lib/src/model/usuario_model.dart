@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 UsuarioModel usuarioModelFromJson(String str) => UsuarioModel.fromJson(json.decode(str));
 
 String usuarioModelToJson(UsuarioModel data) => json.encode(data.toJson());
@@ -42,4 +44,9 @@ class UsuarioModel {
         "fechaNac": fechaNac,
         "estado": estado,
     };
+
+    UsuarioModel.fromSnapshot(DocumentSnapshot snapshot) {
+      this.uid = snapshot.documentID;
+      this.nombres = snapshot.data["nombres"];
+    }
 }

@@ -26,7 +26,7 @@ class _AdminPageState extends State<AdminPage> {
         title: Text(widget.title),
         actions: <Widget>[
           FlatButton(
-            child: Text("Log Out"),
+            child: Text("Salir"),
             textColor: Colors.white,
             onPressed: () {
               FirebaseAuth.instance
@@ -168,7 +168,6 @@ class _UserListState extends State<UserList> {
   }
 
   Stream<List<QuerySnapshot>> getData(){
-    print('getData');
     Stream<QuerySnapshot> streamOne =  getCustomer();
     Stream<QuerySnapshot> streamTwo =  getProvider();
     return StreamZip([streamOne, streamTwo]);

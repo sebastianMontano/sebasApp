@@ -187,9 +187,9 @@ class _RegistroPageState extends State<RegistroPage>{
         onSaved: (value)=> usuario.fechaNac = value.toString(),
         validator: (date){
           final date2 = DateTime.now();
-          print(date2.difference(date).inDays);
+          //print(date2.difference(date).inDays);
           final year = (date2.difference(date).inDays/365).floor();
-          print(year);
+          //print(year);
 
           if( year >= 18){
             return null;
