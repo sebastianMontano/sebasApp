@@ -44,7 +44,8 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "com.williamyataco.appcustomer"
+        //applicationId "com.williamyataco.appcustomer"
+        applicationId "com.smontano.appcustomer"
         minSdkVersion 16
         targetSdkVersion 28
         versionCode 3
@@ -102,5 +103,6 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'com.android.support:multidex:1.0.3'
+    implementation 'com.google.firebase:firebase-core:17.0.0'
 }
 apply plugin: 'com.google.gms.google-services'

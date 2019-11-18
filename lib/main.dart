@@ -5,6 +5,8 @@ import 'package:tp_food/src/pages/home_page.dart';
 import 'package:tp_food/src/pages/login_page.dart';
 import 'package:tp_food/src/pages/product_page.dart';
 import 'package:tp_food/src/pages/registro_page.dart';
+import 'package:tp_food/src/pages/alta_page.dart';
+import 'package:tp_food/src/pages/registroprov_page.dart';
 import 'package:tp_food/src/preferencias_usuario/preferencia_usuario.dart';
  
 void main()  async {
@@ -34,6 +36,8 @@ class MyApp extends StatelessWidget {
           'registro': (BuildContext context ) => RegistroPage(),
           'producto': (BuildContext context ) => ProductoPage(),
           'administrador' : (BuildContext context ) => AdminPage(),
+          'alta': (BuildContext context ) => AltaPage(),
+          'registroProv': (BuildContext context ) => RegistroProvPage()
         },
         theme: ThemeData(
           primaryColor: Colors.deepPurple
